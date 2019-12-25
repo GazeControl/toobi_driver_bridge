@@ -8,9 +8,9 @@
   <arg name="debug" default="false"/>
 
   <!-- Start the Tobii glasses ROS bridge -->
-  <node pkg="tobii_driver"
+  <node pkg="tobii_driver_bridge"
         type="publisher.py"
-        name="tobii_bridge"
+        name="tobii_driver_bridge"
         output="screen">
     <param name="height" value="1080"/>
     <param name="width" value="1920"/>
@@ -19,8 +19,6 @@
     <param name="timeout" value="$(arg timeout)"/>
     <param name="calibrate" value="$(arg calibrate)"/>
     <param name="debug" type="bool" value="$(arg debug)"/>
-    <param name="rate" value="25"/>
-    <param name="imu_rate" value="90"/>
   </node>    
   
 </launch>

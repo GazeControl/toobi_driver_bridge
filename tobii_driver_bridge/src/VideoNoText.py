@@ -3,24 +3,15 @@
 
 # Standard libraries. We need socket for socket communication and json for
 # json parsing
-import socket
-import json
-import pdb
 import rospy
 import cv2
 import numpy as np
-import Queue
 
-from utils import mksock
 from KeepAlive import KeepAlive
-
-from cv_bridge import CvBridge, CvBridgeError
-from sensor_msgs.msg import Image
 
 # GStreamer integration. We need glib for main loop handling and gst for
 # gstreamer video.
 try:
-    import glib
     import gst
 except ImportError:
     print "Please make sure you have glib and gst python integration installed"
@@ -33,8 +24,6 @@ class VideoNoText(object):
     ' starting upon object creation.
     '''
     
-#    IP = rospy.get_param("~ip", "192.168.71.50")
-    IP = rospy.get_param("~ip", "fe80::76fe:48ff:fe2d:583d%eno1")
     _PIPEDEF=[
         "udpsrc name=src blocksize=1316 closefd=false buffer-size=5600", # UDP video data
         "tsparse",                      # parse the incoming stream to MPegTS
@@ -46,15 +35,10 @@ class VideoNoText(object):
     ]
     
     def __init__(self, height, width, channels = 3):
-        self._image = np.zeros((height, width, channels), np.uint8)
-        self._image_ts = 0
         self._height = height
         self._width = width
         self._channels = channels
         self._size = width * height
-
-        self.image_queue = []
-        self.video_ready = False
 
     #Function to convert from h264 to RGB for ROS purposes
     def YUV_stream2RGB_frame(self, data):
@@ -75,11 +59,10 @@ class VideoNoText(object):
         rgb = cv2.cvtColor(yuv, cv2.COLOR_YCR_CB2RGB)
         return rgb
 
-    def start(self, video_sock, peer, buffersync):
+    def start(self, video_sock, peer):
         rospy.loginfo("starting video stream")
         """ Prepare to start grabbing video """
         self._sock = video_sock
-        self._buffersync = buffersync
 
         #Create pipeline
         self._pipeline=gst.parse_launch(" ! ".join(self._PIPEDEF))
@@ -108,12 +91,12 @@ class VideoNoText(object):
 
     def _decoded_buffer(self, ident, buf):
         """Decode the video into a portable format"""
-        nowts = self._buffersync.flush_pts(buf.offset, buf.timestamp/1000)
-        self._image = self.YUV_stream2RGB_frame(buf)
-        self._image_ts = nowts
-        self.image_queue.append((self._image, self._image_ts))
-        if len(self.image_queue) > 2 and not self.video_ready:
-            self.video_ready = True
+        #nowts = self._buffersync.flush_pts(buf.offset, buf.timestamp/1000)
+        image = self.YUV_stream2RGB_frame(buf)
+#        self._image_ts = nowts
+#        self.image_queue.append((self._image, self._image_ts))
+#        if len(self.image_queue) > 2 and not self.video_ready:
+#            self.video_ready = True
 
     def _bus(self, bus, msg):
         """ Buss message handler 
@@ -124,7 +107,7 @@ class VideoNoText(object):
             # If we have a tsdemux message with pts field then lets store it
             # for the render pipeline. Will be picked up by the handoff
             if st.has_name("tsdemux") and st.has_field("pts"):
-                self._buffersync.add_pts_offset(st['offset'], st['pts'])
+                #self._buffersync.add_pts_offset(st['offset'], st['pts'])
         return True
 
     def stop(self):

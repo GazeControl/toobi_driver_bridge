@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tobii_driver)
+project(tobii_driver_bridge)
 
 ############################
 ## Enable C++ 11 Features ##
@@ -21,11 +21,11 @@ endif()
 ###########################
 set(PKG_DEPENDS
   rospy
-  sensor_msgs
-  cv_bridge
-  image_transport
-  geometry_msgs
-  tobii_msgs
+  #sensor_msgs
+  #cv_bridge
+  #image_transport
+  #geometry_msgs
+  tobii_bridge_msgs
   )
 
 set(BUILD_DEPENDS
