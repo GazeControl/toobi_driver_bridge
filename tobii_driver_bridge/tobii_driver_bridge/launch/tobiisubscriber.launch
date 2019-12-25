@@ -1,0 +1,30 @@
+<launch>
+  <arg name="rviz" default="false" />
+  <arg name="image_view" default="false" />
+
+  <!-- Start the Tobii glasses subscriber -->
+  <node pkg="tobii_driver"
+        type="subscriber.py"
+        name="tobii_combiner"
+        output="screen">
+    <param name="height" value="1080"/>
+    <param name="width" value="1920"/>
+  </node>   
+
+  <!-- rviz visualization -->
+  <group if="$(arg rviz)">
+    <group unless="$(arg image_view)">
+      <node pkg="rviz" type="rviz" name="rviz" args="-d $(find tobii_driver)/rviz/tobiidriver.rviz" />
+    </group>
+  </group>
+
+  <!-- image_view visualization -->
+  <group if="$(arg image_view)">
+    <group unless="$(arg rviz)">
+      <node pkg="image_view" type="image_view" name="image_view" >
+      <remap from="image" to="gaze/recombined" />
+      </node>
+    </group>
+  </group>
+ 
+</launch>

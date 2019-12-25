@@ -1,0 +1,55 @@
+<launch>
+  <arg name="calibrate" default="false"/>
+  <!--arg name="ip" default="192.168.71.50"/-->
+  <!--arg name="ip" default="fe80::76fe:48ff:fe2d:583d%enxd8eb97bf9148"/-->
+  <!--arg name="ip" default="fe80::76fe:48ff:fe2d:583d%eth0"/-->  
+  <arg name="ip" default="fe80::76fe:48ff:fe2d:583d%enxd8eb97bf9148"/>
+  <arg name="timeout" default="60"/>
+  <arg name="with_video" default="true"/>
+  <arg name="debug" default="false"/>
+
+  <!-- Start the Tobii glasses ROS bridge -->
+  <node pkg="tobii_driver" type="publisher.py" name="tobii_bridge" output="screen">
+    <param name="height" value="1080"/>
+    <param name="width" value="1920"/>
+    <param name="ip" value="$(arg ip)"/>
+    <param name="port" value="49152"/>
+    <param name="timeout" value="$(arg timeout)"/>
+    <param name="calibrate" value="$(arg calibrate)"/>
+    <param name="debug" value="$(arg debug)"/>
+    <param name="rate" value="25"/>
+    <param name="imu_rate" value="90"/>
+
+    <!-- thees two parameters are the noise model for MEMS sensor/-->
+    <!-- gyro_covariance unit should in rad/s /-->
+    <!-- acc_covariance unit should in m/s^2 /-->
+    <!--param name="gyro_covariance" type="double" value="0.0160447"/-->
+    <!--param name="acc_covariance" type="double" value="0.06084367"/-->
+    <param name="gyro_covariance" type="double" value="0.025"/>
+    <param name="acc_covariance" type="double" value="0.36"/>
+
+    <param name="sys_sc_preset" type="string" value="Auto"/>
+    <param name="sys_ec_preset" type="string" value="Indoor"/>
+  </node>    
+  
+  <node pkg="tf" type="static_transform_publisher" name="tf_transformer" args="0 0 0 0 0 0 1 map tobii_glasses 100"/>
+
+  <arg name="eskf_node" default="attitude_eskf"/>
+  <arg name="imu_topic" default="/gaze/imu"/>
+  <arg name="field_topic" default="/imu/magnetic_field"/>
+  <arg name="gyro_bias_thresh" default="0.01"/>
+  <!-- Start the ESKF for attitude estimation -->
+  <node pkg="kr_attitude_eskf" name="$(arg eskf_node)" type="kr_attitude_eskf" output="screen">
+    <param name="enable_magnetometer" type="bool" value="false"/>
+    <param name="calibrate_magnetometer" type="string" value="none"/>
+    <param name="gyro_bias_thresh" type="double" value="$(arg gyro_bias_thresh)"/>
+    <remap from="~imu" to="$(arg imu_topic)"/>
+    <remap from="~field" to="$(arg field_topic)"/>
+  </node>
+
+  <!-- Start the Tobii glasses subscriber -->
+  <node pkg="tobii_driver" type="subscriber.py" name="tobii_combiner" output="screen">
+    <param name="height" value="1080"/>
+    <param name="width" value="1920"/>
+  </node>   
+</launch>

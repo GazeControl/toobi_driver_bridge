@@ -1,0 +1,26 @@
+<launch>
+  <arg name="calibrate" default="false"/>
+  <!--arg name="ip" default="192.168.71.50"/-->
+  <!--arg name="ip" default="fe80::76fe:48ff:fe2d:583d%enxd8eb97bf9148"/-->
+  <arg name="ip" default="fe80::76fe:48ff:fe2d:583d%enxd8eb97bf9148"/>
+  <!--arg name="ip" default="fe80::76fe:48ff:fe2d:583d%eth0"/-->  
+  <arg name="timeout" default="60"/>
+  <arg name="debug" default="false"/>
+
+  <!-- Start the Tobii glasses ROS bridge -->
+  <node pkg="tobii_driver"
+        type="publisher.py"
+        name="tobii_bridge"
+        output="screen">
+    <param name="height" value="1080"/>
+    <param name="width" value="1920"/>
+    <param name="ip" value="$(arg ip)"/>
+    <param name="port" value="49152"/>
+    <param name="timeout" value="$(arg timeout)"/>
+    <param name="calibrate" value="$(arg calibrate)"/>
+    <param name="debug" type="bool" value="$(arg debug)"/>
+    <param name="rate" value="25"/>
+    <param name="imu_rate" value="90"/>
+  </node>    
+  
+</launch>
