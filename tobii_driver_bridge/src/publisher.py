@@ -139,7 +139,7 @@ class ROSTobiiGlasses(object):
         # check for calibration status
         calibrate = rospy.get_param("~calibrate", True)
         if calibrate:
-            if self.calibrate():
+            self.calibrate()
         else:
             rospy.logwarn("Skipping Calibration")
 

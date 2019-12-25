@@ -107,6 +107,7 @@ class VideoNoText(object):
             # If we have a tsdemux message with pts field then lets store it
             # for the render pipeline. Will be picked up by the handoff
             if st.has_name("tsdemux") and st.has_field("pts"):
+                pass
                 #self._buffersync.add_pts_offset(st['offset'], st['pts'])
         return True
 

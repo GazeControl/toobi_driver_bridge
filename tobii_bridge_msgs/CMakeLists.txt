@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tobii_msgs)
+project(tobii_bridge_msgs)
 
 ############################
 ## Enable C++ 11 Features ##
@@ -47,13 +47,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_message_files(DIRECTORY msg
-  FILES
-  GazeCoordinate2D.msg
-  GazeCoordinate3D.msg
-  Gaze.msg
-  Fixation.msg
-  )
+#add_message_files(DIRECTORY msg
+#  FILES
+#  GazeCoordinate2D.msg
+#  GazeCoordinate3D.msg
+#  Gaze.msg
+#  Fixation.msg
+#  )
 
 generate_messages(
   DEPENDENCIES

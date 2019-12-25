@@ -21,10 +21,10 @@ endif()
 ###########################
 set(PKG_DEPENDS
   rospy
-  #sensor_msgs
+  sensor_msgs
   #cv_bridge
   #image_transport
-  #geometry_msgs
+  geometry_msgs
   tobii_bridge_msgs
   )
 
